@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/all.dart';
+import 'package:provider_listener_counter/count_state.dart';
 import 'package:provider_listener_counter/state_controller_providers.dart';
 import 'package:provider_listener_counter/counter_text.dart';
 
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends ConsumerWidget {
+class MyHomePage extends StatelessWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
   final Widget _scaffoldBody = Center(
@@ -34,21 +35,28 @@ class MyHomePage extends ConsumerWidget {
     ),
   );
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final countStateProvider = Provider.autoDispose(
+      (ref) => ref.watch(countStateControllerProvider.state));
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final countState = watch(countStateControllerProvider.state);
-    showSnackBar(countState.count);
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: _scaffoldBody,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.read(countStateControllerProvider).increment(),
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+  Widget build(BuildContext context) {
+    return ProviderListener(
+      onChange: (context, CountState countState) {
+        showSnackBar(countState.count);
+      },
+      provider: countStateProvider,
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: _scaffoldBody,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () =>
+              context.read(countStateControllerProvider).increment(),
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -60,10 +68,6 @@ class MyHomePage extends ConsumerWidget {
     } else {
       snackBarText = '$count is Odd!';
     }
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) => _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text(snackBarText)),
-      ),
-    );
+    SnackBar(content: Text(snackBarText));
   }
 }
