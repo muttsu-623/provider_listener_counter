@@ -10,9 +10,21 @@ class CounterText extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     final countState = watch(countStateControllerProvider.state);
+    showSnackBar(countState.count);
     return Text(
       '${countState.count}',
       style: Theme.of(context).textTheme.headline4,
     );
+  }
+
+  void showSnackBar(int count) {
+    String snackBarText;
+    if (count % 2 == 0) {
+      snackBarText = '$count is Even!';
+    } else {
+      snackBarText = '$count is Odd!';
+    }
+    _scaffoldKey.currentState
+        .showSnackBar(SnackBar(content: Text(snackBarText)));
   }
 }
