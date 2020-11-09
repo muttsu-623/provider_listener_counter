@@ -21,31 +21,48 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends ConsumerWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
+  final Widget _scaffoldBody = Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text('You have pushed the button this many times:'),
+        CounterText(),
+      ],
+    ),
+  );
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, ScopedReader watch) {
+    final countState = watch(countStateControllerProvider.state);
+    showSnackBar(countState.count);
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('You have pushed the button this many times:'),
-            CounterText(_scaffoldKey),
-          ],
-        ),
-      ),
+      body: _scaffoldBody,
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.read(countStateControllerProvider).increment(),
         tooltip: 'Increment',
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  void showSnackBar(int count) {
+    String snackBarText;
+    if (count % 2 == 0) {
+      snackBarText = '$count is Even!';
+    } else {
+      snackBarText = '$count is Odd!';
+    }
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => _scaffoldKey.currentState.showSnackBar(
+        SnackBar(content: Text(snackBarText)),
       ),
     );
   }
