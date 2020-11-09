@@ -5,6 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider_listener_counter/state_controller_providers.dart';
 
 class CounterText extends ConsumerWidget {
+  CounterText(this._scaffoldKey);
+  final GlobalKey<ScaffoldState> _scaffoldKey;
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     final countState = watch(countStateControllerProvider.state);
