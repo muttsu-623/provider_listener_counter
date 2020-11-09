@@ -24,7 +24,10 @@ class CounterText extends ConsumerWidget {
     } else {
       snackBarText = '$count is Odd!';
     }
-    _scaffoldKey.currentState
-        .showSnackBar(SnackBar(content: Text(snackBarText)));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) => _scaffoldKey.currentState.showSnackBar(
+        SnackBar(content: Text(snackBarText)),
+      ),
+    );
   }
 }
